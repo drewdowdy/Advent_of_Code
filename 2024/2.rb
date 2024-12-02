@@ -34,4 +34,3 @@ Analyze the unusual data from the engineers. How many reports are safe?
 
 =end
 
-test
