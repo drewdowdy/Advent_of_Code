@@ -46,15 +46,13 @@ input = File.open('Advent_of_Code/2024/day_3/input.txt')
 products = []
 
 input.each_line do |line|
-  multiplications = line.scan(/mul\([0-9]{1,3}.[0-9]{1,3}\)/)
+  multiplications = line.scan(/mul\(\d{1,3}.\d{1,3}\)/)
 
   multiplications.each do |multiplication|
     arguments = multiplication.match(/mul\((\d+),(\d+)\)/)
     products << mul(arguments[1].to_i, arguments[2].to_i)
   end
 end
-
-input.rewind
 
 p products.sum
 # => 175700056
@@ -89,6 +87,8 @@ only add products to array if active is true
 each iteration needs to check if active or not
 
 =end
+
+input.rewind
 
 active = true
 
