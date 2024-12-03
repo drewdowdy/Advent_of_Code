@@ -130,7 +130,6 @@ similarity_score = 0
 list1.each do |num|
   score_increase = num * list2.count(num)
   similarity_score += score_increase
-  p similarity_score
 end
 
 p similarity_score
