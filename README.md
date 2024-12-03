@@ -1,3 +1,3 @@
-This is where I keep my answers for Advent of Code
+This is where I keep my personal answers for Advent of Code.
 
 https://adventofcode.com/
