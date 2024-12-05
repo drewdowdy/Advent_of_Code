@@ -163,3 +163,64 @@ p WordSearch.new(puzzle, 'XMAS').solve
 # => 2401
 
 # Part 2
+
+class XmasWordSearch
+  attr_reader :puzzle
+
+  def initialize(puzzle)
+    @puzzle = to_array(puzzle)
+  end
+
+  def solve
+    number_of_matches = 0
+
+    puzzle.each_with_index do |line, row|
+      (0...line.size).each do |col|
+        if puzzle[row][col] == 'A'
+          if bottom_top_diagonal_match?(row, col) && top_bottom_diagonal_match?(row, col)
+            number_of_matches += 1
+          end
+        end
+      end
+    end
+  
+    number_of_matches
+  end
+
+  private
+
+  def to_array(puzzle)
+    parsed_puzzle = []
+
+    puzzle.each_line do |line|
+      parsed_puzzle << line.chomp
+    end
+
+    parsed_puzzle
+  end
+
+  def bottom_top_diagonal_match?(row, col)
+    pairs = [[row + 1, col - 1], [row - 1, col + 1]]
+    return false unless pairs.all? { |pair| in_bounds?(pair[0], pair[1]) }
+
+    top, bottom = puzzle[row - 1][col + 1], puzzle[row + 1][col - 1]
+    (top == 'M' && bottom == 'S') || (top == 'S' && bottom == 'M')
+  end
+
+  def top_bottom_diagonal_match?(row, col)
+    pairs = [[row - 1, col - 1], [row + 1, col + 1]]
+    return false unless pairs.all? { |pair| in_bounds?(pair[0], pair[1]) }
+
+    top, bottom = puzzle[row - 1][col - 1], puzzle[row + 1][col + 1]
+    (top == 'M' && bottom == 'S') || (top == 'S' && bottom == 'M')
+  end
+
+  def in_bounds?(row, col)
+    return false if [puzzle[row], puzzle[col]].include?(nil)
+    (0..puzzle.size).include?(row) && (0..puzzle[0].size).include?(col)
+  end
+end
+
+puzzle.rewind
+p XmasWordSearch.new(puzzle).solve
+# => 1822
