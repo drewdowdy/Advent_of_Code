@@ -172,6 +172,8 @@ parsed_file = FileParser.new(input).array
 rules = Rules.new(parsed_file)
 =end
 
+require 'pry'
+
 def parse(file)
   file_arr = []
 
@@ -183,25 +185,15 @@ def parse(file)
 end
 
 def get_rules(file)
-  before_rules = {}
-  after_rules = {}
+  before_rules = Hash.new { |hsh,k| hsh[k] = [] }
+  after_rules = Hash.new { |hsh,k| hsh[k] = [] }
   
   file.each do |line|
     if line.include?('|')
       arr = line.split('|').map(&:to_i)
       following_num, preceeding_num = arr[0], arr[1]
-
-      if before_rules[following_num] == nil
-        before_rules[following_num] = [preceeding_num]
-      else
-        before_rules[following_num] << preceeding_num
-      end
-
-      if after_rules[preceeding_num] == nil
-        after_rules[preceeding_num] = [following_num]
-      else
-        after_rules[preceeding_num] << following_num
-      end
+      before_rules[following_num] << preceeding_num
+      after_rules[preceeding_num] << following_num
     end
   end
 
@@ -222,29 +214,30 @@ def get_updates(file)
 end
 
 def correct?(update, before_rules, after_rules)  
-  (0...update.size).all? do |idx|
-    prev_nums = update[0..idx - 1]
-    following_nums = update[idx + 1..-1]
-
+  update.each_with_index do |current_num, idx|
     if idx == 0
-      following_nums.all? do |following_num|
-        after_rules[update[idx]].include?(following_num)
-      end
+      after_nums = update[1..-1]
+     return false if !all_included?(after_nums, after_rules[current_num])
     elsif idx == update.size - 1
-      prev_nums.all? do |prev_num|
-        before_rules[update[idx]].include?(prev_num)
-      end
+      before_nums = update[0..-2]
+     return false if !all_included?(before_nums, before_rules[current_num])
     else
-      prev_correct = (prev_nums.all? do |prev_num|
-        before_rules[update[idx]].include?(prev_num)
-      end)
+      before_nums = update[0..idx - 1]
+      after_nums = update[idx + 1..-1]
 
-      following_correct = (following_nums.all? do |following_num|
-        after_rules[update[idx]].include?(following_num)
-      end)
+      before_is_correct = all_included?(before_nums, before_rules[current_num])
+      after_is_correct = all_included?(after_nums, after_rules[current_num])
 
-      prev_correct && following_correct
+     return false if !(before_is_correct && after_is_correct)
     end
+  end
+  
+  true
+end
+
+def all_included?(smaller_arr, bigger_arr)
+  smaller_arr.all? do |item|
+    bigger_arr.include?(item)
   end
 end
 
@@ -260,4 +253,9 @@ end
 
 p correct_updates
 
+# middle_numbers = correct_updates.map do |update|
+#   idx = update.size / 2
+#   update[idx]
+# end
 
+# p middle_numbers.sum
